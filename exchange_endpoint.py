@@ -32,15 +32,74 @@ def shutdown_session(response_or_exc):
 """ Suggested helper methods """
 
 def check_sig(payload,sig):
-    pass
+    payload_pk = payload['sender_pk']
+    if payload['platform'] == 'Algorand':
+        return algosdk.util.verify_bytes(json.dumps(payload).encode('utf-8'), sig, payload_pk)
+    else:
+        eth_encoded_msg = eth_account.messages.encode_defunct(text=json.dumps(payload))
+        return eth_account.Account.recover_message(eth_encoded_msg,signature=sig) == payload_pk
+  
+def fill_order(order):
+    #2.	Check if there are any existing orders that match. 
+    orders = g.session.query(Order).filter(Order.filled == "").all() #Get all unfilled orders
+    for existing_order in orders:
+      if (existing_order.buy_currency == order.sell_currency and 
+        existing_order.sell_currency == order.buy_currency and 
+        existing_order.sell_amount/existing_order.buy_amount >= order.buy_amount/order.sell_amount): #match
+        print("matched")
+    
+        #3.	If a match is found between order and existing_order:
+        #– Set the filled field to be the current timestamp on both orders
+        date_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        existing_order.filled = date_time
+        order.filled = date_time
+        
+        #– Set counterparty_id to be the id of the other order
+        existing_order.counterparty_id = order.id
+        order.counterparty_id = existing_order.id
 
-def fill_order(order,txes=[]):
-    pass
+        #– If one of the orders is not completely filled (i.e. the counterparty’s sell_amount is less than buy_amount):
+        if existing_order.sell_amount < order.buy_amount: #this order is not completely filled
+          parent_order = order
+          buy_amount = order.buy_amount - existing_order.sell_amount
+          sell_amount = order.sell_amount - existing_order.buy_amount
+          #print("parent_order = order")
+          
+        if order.sell_amount < existing_order.buy_amount: #existing_order is not completely filled
+          parent_order = existing_order
+          buy_amount = existing_order.buy_amount - order.sell_amount
+          sell_amount = existing_order.sell_amount - order.buy_amount
+          #print("parent_order = existing_order")
+          
+        if parent_order is not None:
+          #print("parent_order is not None")
+          #o	Create a new order for remaining balance
+          child_order = {} #new dict
+          child_order['buy_amount'] = buy_amount
+          child_order['sell_amount'] = sell_amount
+          child_order['buy_currency'] = parent_order['buy_currency']
+          child_order['sell_currency'] = parent_order['sell_currency']
+          
+          #o	The new order should have the created_by field set to the id of its parent order
+          child_order['created_by'] = parent_order.id
+          
+          #o	The new order should have the same pk and platform as its parent order
+          child_order['sender_pk'] = parent_order.sender_pk
+          child_order['receiver_pk'] = parent_order.receiver_pk
+          
+          #o	The sell_amount of the new order can be any value such that the implied exchange rate of the new order is at least that of the old order
+          #o	You can then try to fill the new order
+          #?fill_order(child_order)
+          
+          break
   
 def log_message(d):
     # Takes input dictionary d and writes it to the Log table
     # Hint: use json.dumps or str() to get it in a nice string form
-    pass
+    msg = json.dumps(d)
+    log = Log(message = msg)
+    g.session.add(log)
+    g.session.commit()
 
 """ End of helper methods """
 
@@ -73,18 +132,38 @@ def trade():
         #Note that you can access the database session using g.session
 
         # TODO: Check the signature
+        sig = content['sig']
+        payload = content['payload']
+        if check_sig(payload,sig): #If the signature verifies, store the signature, as well as all of the fields under the ‘payload’ in the “Order” table EXCEPT for 'platform'.
+            # TODO: Add the order to the database
+            
+            del payload['platform']
+            payload['signature'] = sig
+            order = Order(**{f:payload[f] for f in payload})
+            g.session.add(order)
+            g.session.commit()
         
-        # TODO: Add the order to the database
-        
-        # TODO: Fill the order
-        
-        # TODO: Be sure to return jsonify(True) or jsonify(False) depending on if the method was successful
-        
+            # TODO: Fill the order
+            fill_order(order)
+            
+            return jsonify( True ) # TODO: Be sure to return jsonify(True) or jsonify(False) depending on if the method was successful
+
+        else:  #If the signature does not verify, do not insert the order into the “Order” table. Instead, insert a record into the “Log” table, with the message field set to be json.dumps(payload).
+            print('signature does not verify')
+            log_message(json.dumps(payload))
+            return jsonify( False ) # TODO: Be sure to return jsonify(True) or jsonify(False) depending on if the method was successful
 
 @app.route('/order_book')
 def order_book():
     #Your code here
     #Note that you can access the database session using g.session
+    l = []
+    orders = g.session.query(Order).options(load_only("sender_pk", "receiver_pk", "buy_currency", "sell_currency", "buy_amount", "sell_amount", "signature")).all()
+    for order in orders:
+        d = {"sender_pk": order.sender_pk, "receiver_pk": order.receiver_pk, "buy_currency": order.buy_currency, "sell_currency": order.sell_currency, "buy_amount": order.buy_amount, "sell_amount": order.sell_amount, "signature": order.signature}
+        #print("      ", d)
+        l.append(d)
+    result = {'data': l}
     return jsonify(result)
 
 if __name__ == '__main__':
