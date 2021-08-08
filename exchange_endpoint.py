@@ -164,7 +164,7 @@ def order_book():
         #print("      ", d)
         l.append(d)
     result = {'data': l}
-    return jsonify(result)
+    return jsonify(l)
 
 if __name__ == '__main__':
     app.run(port='5002')
