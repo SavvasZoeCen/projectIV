@@ -136,7 +136,7 @@ def trade():
         payload = content['payload']
         if check_sig(payload,sig): #If the signature verifies, store the signature, as well as all of the fields under the ‘payload’ in the “Order” table EXCEPT for 'platform'.
             # TODO: Add the order to the database
-            
+            print('signature does not verify')
             del payload['platform']
             payload['signature'] = sig
             order = Order(**{f:payload[f] for f in payload})
@@ -164,7 +164,7 @@ def order_book():
         #print("      ", d)
         l.append(d)
     result = {'data': l}
-    return jsonify(l)
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(port='5002')
