@@ -40,7 +40,7 @@ def check_sig(payload,sig):
         return eth_account.Account.recover_message(eth_encoded_msg,signature=sig) == payload_pk
   
 def fill_order(order):
-    print("fill_order:", order.id, order.filled)
+    print("fill_order:", order.tx_id, order.filled)
     g.session.add(order)
     g.session.commit()
         
@@ -59,8 +59,8 @@ def fill_order(order):
         order.filled = dt
         
         #– Set counterparty_id to be the id of the other order
-        existing_order.counterparty_id = order.id
-        order.counterparty_id = existing_order.id
+        existing_order.counterparty_id = order.tx_id
+        order.counterparty_id = existing_order.tx_id
 
         #– If one of the orders is not completely filled (i.e. the counterparty’s sell_amount is less than buy_amount):
         if existing_order.sell_amount < order.buy_amount: #this order is not completely filled
@@ -85,7 +85,7 @@ def fill_order(order):
           child_order['sell_currency'] = parent_order.sell_currency
           
           #o    The new order should have the created_by field set to the id of its parent order
-          child_order['creator_id'] = parent_order.id
+          child_order['creator_id'] = parent_order.tx_id
           
           #o    The new order should have the same pk and platform as its parent order
           child_order['sender_pk'] = parent_order.sender_pk
