@@ -25,7 +25,7 @@ def create_session():
 @app.teardown_appcontext
 def shutdown_session(response_or_exc):
     sys.stdout.flush()
-    g.session.commit()
+    #g.session.commit()
     g.session.remove()
 
 
