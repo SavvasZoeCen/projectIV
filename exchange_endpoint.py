@@ -41,7 +41,7 @@ def check_sig(payload,sig):
   
 def fill_order(order):
     #order.counterparty_id = 0
-    #print("fill_order:", order.tx_id, order.filled)
+    #print("fill_order:", order.id, order.filled)
     dt = datetime.now()
     order.timestamp = dt
     order.filled = datetime(2222, 2, 2)
@@ -63,8 +63,8 @@ def fill_order(order):
         order.filled = dt
         
         #– Set counterparty_id to be the id of the other order
-        existing_order.counterparty_id = order.tx_id
-        order.counterparty_id = existing_order.tx_id
+        existing_order.counterparty_id = order.id
+        order.counterparty_id = existing_order.id
         g.session.commit()
         
 
@@ -91,7 +91,7 @@ def fill_order(order):
           child_order['sell_currency'] = parent_order.sell_currency
           
           #o    The new order should have the created_by field set to the id of its parent order
-          child_order['creator_id'] = parent_order.tx_id
+          child_order['creator_id'] = parent_order.id
           
           #o    The new order should have the same pk and platform as its parent order
           child_order['sender_pk'] = parent_order.sender_pk
