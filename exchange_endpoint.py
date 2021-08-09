@@ -27,6 +27,7 @@ def shutdown_session(response_or_exc):
     sys.stdout.flush()
     g.session.commit()
     g.session.remove()
+    print("------------------------------------------------------------------------------------------")
 
 
 """ Suggested helper methods """
