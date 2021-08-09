@@ -40,7 +40,7 @@ def check_sig(payload,sig):
         return eth_account.Account.recover_message(eth_encoded_msg,signature=sig) == payload_pk
   
 def fill_order(order):
-    print("fill_order:", order)
+    print("fill_order:", str(order))
     g.session.add(order)
     g.session.commit()
         
@@ -54,8 +54,9 @@ def fill_order(order):
     
         #3.    If a match is found between order and existing_order:
         #– Set the filled field to be the current timestamp on both orders
-        existing_order.filled = datetime.utcnow
-        order.filled = datetime.utcnow
+        dt = datetime.utcnow
+        existing_order.filled = dt
+        order.filled = dt
         
         #– Set counterparty_id to be the id of the other order
         existing_order.counterparty_id = order.id
