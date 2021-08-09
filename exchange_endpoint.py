@@ -70,7 +70,7 @@ def fill_order(order):
           sell_amount = existing_order.sell_amount - order.buy_amount
           #print("parent_order = existing_order")
           
-        if parent_order is not None:
+        if existing_order.sell_amount < order.buy_amount or order.sell_amount < existing_order.buy_amount:
           #print("parent_order is not None")
           #o    Create a new order for remaining balance
           child_order = {} #new dict
