@@ -139,8 +139,10 @@ def trade():
             # TODO: Add the order to the database
             print('signature does verify')
             del payload['platform']
+            del payload['pk']
             payload['signature'] = sig
             payload['filled'] = ""
+            print("payload:", payload)
             order = Order(**{f:payload[f] for f in payload})
             g.session.add(order)
             g.session.commit()
