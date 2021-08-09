@@ -41,6 +41,7 @@ def check_sig(payload,sig):
   
 def fill_order(order):
     print("fill_order:", order.tx_id, order.filled)
+    order.filled = datetime(1, 1, 1, 0, 0)
     g.session.add(order)
     g.session.commit()
         
@@ -54,7 +55,7 @@ def fill_order(order):
     
         #3.    If a match is found between order and existing_order:
         #– Set the filled field to be the current timestamp on both orders
-        dt = datetime.utcnow
+        dt = datetime.now()
         existing_order.filled = dt
         order.filled = dt
         
@@ -93,7 +94,6 @@ def fill_order(order):
           
           #o    The sell_amount of the new order can be any value such that the implied exchange rate of the new order is at least that of the old order
           #o    You can then try to fill the new order
-          child_order['filled'] = datetime(1, 1, 1, 0, 0)
           corder = Order(**{f:child_order[f] for f in child_order})
           fill_order(corder)
           
@@ -146,7 +146,6 @@ def trade():
             del payload['platform']
             del payload['pk']
             payload['signature'] = sig
-            payload['filled'] = datetime(1, 1, 1, 0, 0)
             order = Order(**{f:payload[f] for f in payload})
             # TODO: Fill the order
             fill_order(order)
