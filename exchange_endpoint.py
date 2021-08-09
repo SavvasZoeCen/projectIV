@@ -142,7 +142,7 @@ def trade():
             payload['signature'] = sig
             payload['filled'] = False
             date_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-            payload['timestamp'] = date_time
+            #payload['timestamp'] = date_time
             print("payload:", payload)
             order = Order(**{f:payload[f] for f in payload})
             g.session.add(order)
