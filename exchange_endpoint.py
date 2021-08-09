@@ -40,7 +40,7 @@ def check_sig(payload,sig):
         return eth_account.Account.recover_message(eth_encoded_msg,signature=sig) == payload_pk
   
 def fill_order(order):
-    print("fill_order:", str(order))
+    print("fill_order:", order.id, order.filled)
     g.session.add(order)
     g.session.commit()
         
