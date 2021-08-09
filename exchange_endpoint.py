@@ -41,7 +41,7 @@ def check_sig(payload,sig):
   
 def fill_order(order):
     #2.    Check if there are any existing orders that match. 
-    orders = g.session.query(Order).filter(Order.filled == datetime(0)).all() #Get all unfilled orders
+    orders = g.session.query(Order).filter(Order.filled == datetime(1, 1, 1, 0, 0)).all() #Get all unfilled orders
     for existing_order in orders:
       if (existing_order.buy_currency == order.sell_currency and 
         existing_order.sell_currency == order.buy_currency and 
@@ -140,7 +140,7 @@ def trade():
             del payload['platform']
             del payload['pk']
             payload['signature'] = sig
-            payload['filled'] = datetime(0)
+            payload['filled'] = datetime(1, 1, 1, 0, 0)
             print("payload:", payload)
             order = Order(**{f:payload[f] for f in payload})
             g.session.add(order)
