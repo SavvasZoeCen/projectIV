@@ -89,7 +89,8 @@ def fill_order(order):
           
           #o	The sell_amount of the new order can be any value such that the implied exchange rate of the new order is at least that of the old order
           #o	You can then try to fill the new order
-          fill_order(child_order)
+          corder = Order(**{f:child_order[f] for f in child_order})
+          fill_order(corder)
           
           break
   
