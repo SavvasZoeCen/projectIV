@@ -42,7 +42,7 @@ def check_sig(payload,sig):
         return eth_account.Account.recover_message(eth_encoded_msg,signature=sig) == payload_pk
   
 def fill_order(order):
-    #order.counterparty_id = 0
+    order.counterparty_id = order.id
     dt = datetime.now()
     order.timestamp = dt
     order.filled = datetime(2222, 2, 2)
