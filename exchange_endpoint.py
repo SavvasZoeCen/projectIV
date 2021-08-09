@@ -40,6 +40,10 @@ def check_sig(payload,sig):
         return eth_account.Account.recover_message(eth_encoded_msg,signature=sig) == payload_pk
   
 def fill_order(order):
+    print("fill_order:", order)
+    g.session.add(order)
+    g.session.commit()
+        
     #2.    Check if there are any existing orders that match. 
     orders = g.session.query(Order).filter(Order.filled == datetime(1, 1, 1, 0, 0)).all() #Get all unfilled orders
     for existing_order in orders:
@@ -90,8 +94,6 @@ def fill_order(order):
           #o    You can then try to fill the new order
           child_order['filled'] = datetime(1, 1, 1, 0, 0)
           corder = Order(**{f:child_order[f] for f in child_order})
-          g.session.add(corder)
-          g.session.commit()
           fill_order(corder)
           
           break
@@ -144,11 +146,7 @@ def trade():
             del payload['pk']
             payload['signature'] = sig
             payload['filled'] = datetime(1, 1, 1, 0, 0)
-            print("payload:", payload)
             order = Order(**{f:payload[f] for f in payload})
-            g.session.add(order)
-            g.session.commit()
-        
             # TODO: Fill the order
             fill_order(order)
             
