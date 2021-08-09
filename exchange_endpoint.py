@@ -66,14 +66,14 @@ def fill_order(order):
         existing_order.counterparty_id = order.id
         order.counterparty_id = existing_order.id
         g.session.commit()
-        
+        print("order.id:", order.id)
+        print("existing_order.id:", existing_order.id)        
 
         #– If one of the orders is not completely filled (i.e. the counterparty’s sell_amount is less than buy_amount):
         if existing_order.sell_amount < order.buy_amount: #this order is not completely filled
           parent_order = order
           buy_amount = order.buy_amount - existing_order.sell_amount
           sell_amount = order.sell_amount - existing_order.buy_amount
-          #print("parent_order = order")
           
         if order.sell_amount < existing_order.buy_amount: #existing_order is not completely filled
           parent_order = existing_order
@@ -92,6 +92,7 @@ def fill_order(order):
           
           #o    The new order should have the created_by field set to the id of its parent order
           child_order['creator_id'] = parent_order.id
+          print("parent_order.id:", parent_order.id)
           
           #o    The new order should have the same pk and platform as its parent order
           child_order['sender_pk'] = parent_order.sender_pk
