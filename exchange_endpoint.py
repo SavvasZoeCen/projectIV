@@ -90,6 +90,8 @@ def fill_order(order):
           #o    You can then try to fill the new order
           child_order['filled'] = datetime(1, 1, 1, 0, 0)
           corder = Order(**{f:child_order[f] for f in child_order})
+          g.session.add(corder)
+          g.session.commit()
           fill_order(corder)
           
           break
