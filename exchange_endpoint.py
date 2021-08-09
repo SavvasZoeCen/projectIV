@@ -40,8 +40,8 @@ def check_sig(payload,sig):
         return eth_account.Account.recover_message(eth_encoded_msg,signature=sig) == payload_pk
   
 def fill_order(order):
-    print("fill_order:", order.tx_id, order.filled)
     order.filled = datetime(2222, 2, 2)
+    print("fill_order:", order.tx_id, order.filled)
     g.session.add(order)
     g.session.commit()
         
@@ -62,8 +62,7 @@ def fill_order(order):
         #– Set counterparty_id to be the id of the other order
         existing_order.counterparty_id = order.tx_id
         order.counterparty_id = existing_order.tx_id
-        existing_order.counterparty = [order]
-        order.counterparty = [existing_order]
+        g.session.commit()
         
 
         #– If one of the orders is not completely filled (i.e. the counterparty’s sell_amount is less than buy_amount):
