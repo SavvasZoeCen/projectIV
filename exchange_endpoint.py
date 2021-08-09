@@ -140,6 +140,7 @@ def trade():
             print('signature does not verify')
             del payload['platform']
             payload['signature'] = sig
+            payload['filled'] = ""
             order = Order(**{f:payload[f] for f in payload})
             g.session.add(order)
             g.session.commit()
