@@ -21,14 +21,14 @@ app = Flask(__name__)
 @app.before_request
 def create_session():
     g.session = scoped_session(DBSession)
-    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    #print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 @app.teardown_appcontext
 def shutdown_session(response_or_exc):
     sys.stdout.flush()
     g.session.commit()
     g.session.remove()
-    print("------------------------------------------------------------------------------------------")
+    #print("------------------------------------------------------------------------------------------")
 
 
 """ Suggested helper methods """
