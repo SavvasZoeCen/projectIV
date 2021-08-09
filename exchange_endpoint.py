@@ -54,7 +54,8 @@ def fill_order(order):
     orders = g.session.query(Order).filter(Order.filled == datetime(2222, 2, 2)).all() #Get all unfilled orders
     for existing_order in orders:
       if (existing_order.buy_currency == order.sell_currency and 
-        existing_order.sell_currency == order.buy_currency): #match
+        existing_order.sell_currency == order.buy_currency and 
+        existing_order.sell_amount/existing_order.buy_amount >= order.buy_amount/order.sell_amount): #match
         #print("matched")
     
         #3.    If a match is found between order and existing_order:
@@ -78,7 +79,7 @@ def fill_order(order):
           buy_amount = order.buy_amount - existing_order.sell_amount
           sell_amount = order.sell_amount - existing_order.buy_amount
           
-        elif order.sell_amount < existing_order.buy_amount: #existing_order is not completely filled
+        if order.sell_amount < existing_order.buy_amount: #existing_order is not completely filled
           parent_order = existing_order
           buy_amount = existing_order.buy_amount - order.sell_amount
           sell_amount = existing_order.sell_amount - order.buy_amount
