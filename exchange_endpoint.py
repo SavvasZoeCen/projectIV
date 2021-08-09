@@ -80,7 +80,7 @@ def fill_order(order):
           child_order['sell_currency'] = parent_order.sell_currency
           
           #o    The new order should have the created_by field set to the id of its parent order
-          child_order['created_by'] = parent_order.id
+          child_order['creator_id'] = parent_order.id
           
           #o    The new order should have the same pk and platform as its parent order
           child_order['sender_pk'] = parent_order.sender_pk
