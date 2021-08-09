@@ -67,6 +67,8 @@ def fill_order(order):
         #– Set counterparty_id to be the id of the other order
         existing_order.counterparty_id = order.id
         order.counterparty_id = existing_order.id
+        existing_order.counterparty = [order]
+        order.counterparty = [existing_order]
         g.session.commit()
         print("order.id:", order.id)
         print("existing_order.id:", existing_order.id)        
