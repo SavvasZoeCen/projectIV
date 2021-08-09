@@ -25,7 +25,7 @@ def create_session():
 @app.teardown_appcontext
 def shutdown_session(response_or_exc):
     sys.stdout.flush()
-    g.session.commit()
+    #g.session.commit()
     g.session.remove()
 
 
@@ -41,7 +41,8 @@ def check_sig(payload,sig):
   
 def fill_order(order):
     order.filled = datetime(2222, 2, 2)
-    print("fill_order:", order.tx_id, order.filled)
+    order.counterparty_id = 0
+    #print("fill_order:", order.tx_id, order.filled)
     g.session.add(order)
     g.session.commit()
         
@@ -51,7 +52,7 @@ def fill_order(order):
       if (existing_order.buy_currency == order.sell_currency and 
         existing_order.sell_currency == order.buy_currency and 
         existing_order.sell_amount/existing_order.buy_amount >= order.buy_amount/order.sell_amount): #match
-        print("matched")
+        #print("matched")
     
         #3.    If a match is found between order and existing_order:
         #– Set the filled field to be the current timestamp on both orders
@@ -115,10 +116,10 @@ def log_message(d):
 
 @app.route('/trade', methods=['POST'])
 def trade():
-    print("In trade endpoint")
+    #print("In trade endpoint")
     if request.method == "POST":
         content = request.get_json(silent=True)
-        print( f"content = {json.dumps(content)}" )
+        #print( f"content = {json.dumps(content)}" )
         columns = [ "sender_pk", "receiver_pk", "buy_currency", "sell_currency", "buy_amount", "sell_amount", "platform" ]
         fields = [ "sig", "payload" ]
 
@@ -144,7 +145,7 @@ def trade():
         payload = content['payload']
         if check_sig(payload,sig): #If the signature verifies, store the signature, as well as all of the fields under the ‘payload’ in the “Order” table EXCEPT for 'platform'.
             # TODO: Add the order to the database
-            print('signature does verify')
+            #print('signature does verify')
             del payload['platform']
             del payload['pk']
             payload['signature'] = sig
