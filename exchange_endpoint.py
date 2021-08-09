@@ -76,8 +76,8 @@ def fill_order(order):
           child_order = {} #new dict
           child_order['buy_amount'] = buy_amount
           child_order['sell_amount'] = sell_amount
-          child_order['buy_currency'] = parent_order['buy_currency']
-          child_order['sell_currency'] = parent_order['sell_currency']
+          child_order['buy_currency'] = parent_order.buy_currency
+          child_order['sell_currency'] = parent_order.sell_currency
           
           #o    The new order should have the created_by field set to the id of its parent order
           child_order['created_by'] = parent_order.id
@@ -88,6 +88,7 @@ def fill_order(order):
           
           #o    The sell_amount of the new order can be any value such that the implied exchange rate of the new order is at least that of the old order
           #o    You can then try to fill the new order
+          child_order['filled'] = datetime(1, 1, 1, 0, 0)
           corder = Order(**{f:child_order[f] for f in child_order})
           fill_order(corder)
           
