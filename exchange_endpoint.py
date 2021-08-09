@@ -41,12 +41,12 @@ def check_sig(payload,sig):
   
 def fill_order(order):
     print("fill_order:", order.tx_id, order.filled)
-    order.filled = datetime(1, 1, 1, 0, 0)
+    order.filled = datetime(2222, 2, 2)
     g.session.add(order)
     g.session.commit()
         
     #2.    Check if there are any existing orders that match. 
-    orders = g.session.query(Order).filter(Order.filled == datetime(1, 1, 1, 0, 0)).all() #Get all unfilled orders
+    orders = g.session.query(Order).filter(Order.filled == datetime(2222, 2, 2)).all() #Get all unfilled orders
     for existing_order in orders:
       if (existing_order.buy_currency == order.sell_currency and 
         existing_order.sell_currency == order.buy_currency and 
@@ -62,6 +62,9 @@ def fill_order(order):
         #– Set counterparty_id to be the id of the other order
         existing_order.counterparty_id = order.tx_id
         order.counterparty_id = existing_order.tx_id
+        existing_order.counterparty = [order]
+        order.counterparty = [existing_order]
+        
 
         #– If one of the orders is not completely filled (i.e. the counterparty’s sell_amount is less than buy_amount):
         if existing_order.sell_amount < order.buy_amount: #this order is not completely filled
