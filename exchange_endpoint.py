@@ -97,7 +97,7 @@ def fill_order(order):
           corder = Order(**{f:child_order[f] for f in child_order})
           fill_order(corder)
           
-          break
+        break
   
 def log_message(d):
     # Takes input dictionary d and writes it to the Log table
