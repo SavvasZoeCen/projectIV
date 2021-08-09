@@ -137,7 +137,7 @@ def trade():
         payload = content['payload']
         if check_sig(payload,sig): #If the signature verifies, store the signature, as well as all of the fields under the ‘payload’ in the “Order” table EXCEPT for 'platform'.
             # TODO: Add the order to the database
-            print('signature does not verify')
+            print('signature does verify')
             del payload['platform']
             payload['signature'] = sig
             payload['filled'] = ""
@@ -148,12 +148,12 @@ def trade():
             # TODO: Fill the order
             fill_order(order)
             
-            return jsonify( True ) # TODO: Be sure to return jsonify(True) or jsonify(False) depending on if the method was successful
+            return jsonify(True) # TODO: Be sure to return jsonify(True) or jsonify(False) depending on if the method was successful
 
         else:  #If the signature does not verify, do not insert the order into the “Order” table. Instead, insert a record into the “Log” table, with the message field set to be json.dumps(payload).
             print('signature does not verify')
-            log_message(json.dumps(payload))
-            return jsonify( False ) # TODO: Be sure to return jsonify(True) or jsonify(False) depending on if the method was successful
+            log_message(payload)
+            return jsonify(False) # TODO: Be sure to return jsonify(True) or jsonify(False) depending on if the method was successful
 
 @app.route('/order_book')
 def order_book():
