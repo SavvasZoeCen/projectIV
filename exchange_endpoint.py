@@ -40,7 +40,7 @@ def check_sig(payload,sig):
         return eth_account.Account.recover_message(eth_encoded_msg,signature=sig) == payload_pk
   
 def fill_order(order):
-    #2.	Check if there are any existing orders that match. 
+    #2.    Check if there are any existing orders that match. 
     orders = g.session.query(Order).filter(Order.filled == False).all() #Get all unfilled orders
     for existing_order in orders:
       if (existing_order.buy_currency == order.sell_currency and 
@@ -48,7 +48,7 @@ def fill_order(order):
         existing_order.sell_amount/existing_order.buy_amount >= order.buy_amount/order.sell_amount): #match
         print("matched")
     
-        #3.	If a match is found between order and existing_order:
+        #3.    If a match is found between order and existing_order:
         #– Set the filled field to be the current timestamp on both orders
         existing_order.filled = True
         order.filled = True
@@ -72,22 +72,22 @@ def fill_order(order):
           
         if parent_order is not None:
           #print("parent_order is not None")
-          #o	Create a new order for remaining balance
+          #o    Create a new order for remaining balance
           child_order = {} #new dict
           child_order['buy_amount'] = buy_amount
           child_order['sell_amount'] = sell_amount
           child_order['buy_currency'] = parent_order['buy_currency']
           child_order['sell_currency'] = parent_order['sell_currency']
           
-          #o	The new order should have the created_by field set to the id of its parent order
+          #o    The new order should have the created_by field set to the id of its parent order
           child_order['created_by'] = parent_order.id
           
-          #o	The new order should have the same pk and platform as its parent order
+          #o    The new order should have the same pk and platform as its parent order
           child_order['sender_pk'] = parent_order.sender_pk
           child_order['receiver_pk'] = parent_order.receiver_pk
           
-          #o	The sell_amount of the new order can be any value such that the implied exchange rate of the new order is at least that of the old order
-          #o	You can then try to fill the new order
+          #o    The sell_amount of the new order can be any value such that the implied exchange rate of the new order is at least that of the old order
+          #o    You can then try to fill the new order
           corder = Order(**{f:child_order[f] for f in child_order})
           fill_order(corder)
           
@@ -141,7 +141,7 @@ def trade():
             del payload['pk']
             payload['signature'] = sig
             payload['filled'] = False
-			date_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+            date_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
             payload['timestamp'] = date_time
             print("payload:", payload)
             order = Order(**{f:payload[f] for f in payload})
