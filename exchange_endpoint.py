@@ -21,14 +21,14 @@ app = Flask(__name__)
 @app.before_request
 def create_session():
     g.session = scoped_session(DBSession)
-    #print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 @app.teardown_appcontext
 def shutdown_session(response_or_exc):
     sys.stdout.flush()
     g.session.commit()
     g.session.remove()
-    #print("------------------------------------------------------------------------------------------")
+    print("------------------------------------------------------------------------------------------")
 
 
 """ Suggested helper methods """
@@ -55,7 +55,7 @@ def fill_order(order):
     for existing_order in orders:
       if (existing_order.buy_currency == order.sell_currency and 
         existing_order.sell_currency == order.buy_currency and 
-        existing_order.sell_amount/existing_order.buy_amount >= order.buy_amount/order.sell_amount): #match
+        float(existing_order.sell_amount)/float(existing_order.buy_amount) >= float(order.buy_amount)/float(order.sell_amount)): #match
         #print("matched")
     
         #3.    If a match is found between order and existing_order:
