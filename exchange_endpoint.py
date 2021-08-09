@@ -42,12 +42,12 @@ def check_sig(payload,sig):
   
 def fill_order(order):
     #order.counterparty_id = 0
-    #print("fill_order:", order.id, order.filled)
     dt = datetime.now()
     order.timestamp = dt
     order.filled = datetime(2222, 2, 2)
     g.session.add(order)
     g.session.commit()
+    print("fill_order:", order.id, order.buy_currency, order.sell_currency, order.buy_amount, order.sell_amount, order.timestamp)
         
     #2.    Check if there are any existing orders that match. 
     orders = g.session.query(Order).filter(Order.filled == datetime(2222, 2, 2)).all() #Get all unfilled orders
