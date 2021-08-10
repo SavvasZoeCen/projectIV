@@ -85,6 +85,9 @@ def fill_order(order):
         else:
           return
 
+        if buy_amount==0 or sell_amount==0:
+          return
+        
         #o    Create a new order for remaining balance
         child_order = {} #new dict
         child_order['buy_amount'] = buy_amount
