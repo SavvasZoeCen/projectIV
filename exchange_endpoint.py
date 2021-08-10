@@ -21,14 +21,14 @@ app = Flask(__name__)
 @app.before_request
 def create_session():
     g.session = scoped_session(DBSession)
-    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    #print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
 @app.teardown_appcontext
 def shutdown_session(response_or_exc):
     sys.stdout.flush()
     g.session.commit()
     g.session.remove()
-    print("------------------------------------------------------------------------------------------")
+    #print("------------------------------------------------------------------------------------------")
 
 
 """ Suggested helper methods """
@@ -55,7 +55,7 @@ def fill_order(order):
     for existing_order in orders:
       if (existing_order.buy_currency == order.sell_currency and 
         existing_order.sell_currency == order.buy_currency and 
-        float(existing_order.sell_amount)/float(existing_order.buy_amount) >= float(order.buy_amount)/float(order.sell_amount)): #match
+        float(existing_order.sell_amount)/float(existing_order.buy_amount) > float(order.buy_amount)/float(order.sell_amount)): #match
         #print("matched")
     
         #3.    If a match is found between order and existing_order:
@@ -123,10 +123,10 @@ def log_message(d):
 
 @app.route('/trade', methods=['POST'])
 def trade():
-    #print("In trade endpoint")
+    print("In trade endpoint")
     if request.method == "POST":
         content = request.get_json(silent=True)
-        #print( f"content = {json.dumps(content)}" )
+        print( f"content = {json.dumps(content)}" )
         columns = [ "sender_pk", "receiver_pk", "buy_currency", "sell_currency", "buy_amount", "sell_amount", "platform" ]
         fields = [ "sig", "payload" ]
 
@@ -178,7 +178,7 @@ def order_book():
         #print("      ", d)
         l.append(d)
     result = {'data': l}
-    return jsonify(result)
+    return jsonify(data=result)
 
 if __name__ == '__main__':
     app.run(port='5002')
