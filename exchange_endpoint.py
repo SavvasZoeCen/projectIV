@@ -74,40 +74,38 @@ def fill_order(order):
         print("existing_order.id:", existing_order.id)        
 
         #– If one of the orders is not completely filled (i.e. the counterparty’s sell_amount is less than buy_amount):
-        if existing_order.sell_amount < order.buy_amount: #this order is not completely filled
+        if existing_order.buy_amount < order.sell_amount: #this order is not completely filled
           parent_order = order
           buy_amount = order.buy_amount - existing_order.sell_amount
           sell_amount = order.sell_amount - existing_order.buy_amount
-          
-        if order.sell_amount < existing_order.buy_amount: #existing_order is not completely filled
+        elif order.buy_amount < existing_order.sell_amount: #existing_order is not completely filled
           parent_order = existing_order
           buy_amount = existing_order.buy_amount - order.sell_amount
           sell_amount = existing_order.sell_amount - order.buy_amount
-          #print("parent_order = existing_order")
+        else:
+          return
+
+        #o    Create a new order for remaining balance
+        child_order = {} #new dict
+        child_order['buy_amount'] = buy_amount
+        child_order['sell_amount'] = sell_amount
+        child_order['buy_currency'] = parent_order.buy_currency
+        child_order['sell_currency'] = parent_order.sell_currency
+        
+        #o    The new order should have the created_by field set to the id of its parent order
+        child_order['creator_id'] = parent_order.id
+        print("parent_order.id:", parent_order.id)
+        
+        #o    The new order should have the same pk and platform as its parent order
+        child_order['sender_pk'] = parent_order.sender_pk
+        child_order['receiver_pk'] = parent_order.receiver_pk
+        
+        #o    The sell_amount of the new order can be any value such that the implied exchange rate of the new order is at least that of the old order
+        #o    You can then try to fill the new order
+        corder = Order(**{f:child_order[f] for f in child_order})
+        fill_order(corder)
           
-        if existing_order.sell_amount < order.buy_amount or order.sell_amount < existing_order.buy_amount:
-          #print("parent_order is not None")
-          #o    Create a new order for remaining balance
-          child_order = {} #new dict
-          child_order['buy_amount'] = buy_amount
-          child_order['sell_amount'] = sell_amount
-          child_order['buy_currency'] = parent_order.buy_currency
-          child_order['sell_currency'] = parent_order.sell_currency
-          
-          #o    The new order should have the created_by field set to the id of its parent order
-          child_order['creator_id'] = parent_order.id
-          print("parent_order.id:", parent_order.id)
-          
-          #o    The new order should have the same pk and platform as its parent order
-          child_order['sender_pk'] = parent_order.sender_pk
-          child_order['receiver_pk'] = parent_order.receiver_pk
-          
-          #o    The sell_amount of the new order can be any value such that the implied exchange rate of the new order is at least that of the old order
-          #o    You can then try to fill the new order
-          corder = Order(**{f:child_order[f] for f in child_order})
-          fill_order(corder)
-          
-        break
+        return
   
 def log_message(d):
     # Takes input dictionary d and writes it to the Log table
@@ -178,7 +176,7 @@ def order_book():
         #print("      ", d)
         l.append(d)
     result = {'data': l}
-    return jsonify(result)
+    return jsonify(data=result)
 
 if __name__ == '__main__':
     app.run(port='5002')
